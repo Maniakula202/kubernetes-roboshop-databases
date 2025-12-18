@@ -62,7 +62,7 @@ spec:
           failureThreshold: 1
           initialDelaySeconds: 5
           periodSeconds: 3  
-        readynessProbe:
+        readinessProbe:
           httpGet:
             path: /health
             port: 8080
