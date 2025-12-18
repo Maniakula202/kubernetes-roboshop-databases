@@ -31,7 +31,7 @@ metadata:
     component: payment
     tier: backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       project: roboshop
@@ -46,7 +46,7 @@ spec:
     spec:
       containers:
       - name: payment
-        image: manikantaakula/payment:v1
+        image: joindevops/payment:v1
         imagePullPolicy: Always
         envFrom:
         - configMapRef:

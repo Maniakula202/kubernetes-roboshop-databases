@@ -87,7 +87,7 @@ metadata:
     component: frontend
     tier: backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       project: roboshop
@@ -102,7 +102,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: manikantaakula/frontend:v1
+        image: joindevops/frontend:v1
         imagePullPolicy: Always
         # envFrom:
         # - configMapRef:

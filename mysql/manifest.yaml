@@ -69,7 +69,7 @@ spec:
       # terminationGracePeriodSeconds: 10
       containers:
       - name: mysql
-        image: manikantaakula/mysql:v1
+        image: joindevops/mysql:v1
         imagePullPolicy: Always
         # ports:
         # - containerPort: 80

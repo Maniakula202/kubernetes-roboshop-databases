@@ -26,7 +26,7 @@ metadata:
     component: catalogue
     tier: backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       project: roboshop
@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
       - name: catalogue
-        image: manikantaakula/catalogue:v1
+        image: joindevops/catalogue:v1
         imagePullPolicy: Always
         envFrom:
         - configMapRef:

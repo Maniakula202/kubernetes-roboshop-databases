@@ -69,7 +69,7 @@ spec:
       # terminationGracePeriodSeconds: 10
       containers:
       - name: mongodb
-        image: manikantaakula/mongodb:v1
+        image: joindevops/mongodb:v1
         imagePullPolicy: Always
         # ports:
         # - containerPort: 80
