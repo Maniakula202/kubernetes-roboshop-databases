@@ -1,0 +1,89 @@
+### headless service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-headless
+  namespace: roboshop
+  labels:
+    project: roboshop
+    purpose: mysql
+    tier: db 
+spec:
+  clusterIP: None
+  selector:
+    project: roboshop
+    purpose: mysql
+    tier: db
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+---
+
+### service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: roboshop
+  labels:
+    project: roboshop
+    purpose: mysql
+    tier: db 
+spec:
+  selector:
+    project: roboshop
+    purpose: mysql
+    tier: db
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+---
+
+### statefullset 
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  namespace: roboshop
+spec:
+  selector:
+    matchLabels:
+      project: roboshop
+      purpose: mysql
+      tier: db # has to match .spec.template.metadata.labels
+  serviceName: "mysql-headless"
+  replicas: 2 # by default is 1
+  # minReadySeconds: 10 # by default is 0
+  template:
+    metadata:
+      labels:
+        project: roboshop
+        purpose: mysql
+        tier: db # has to match .spec.selector.matchLabels
+    spec:
+      # terminationGracePeriodSeconds: 10
+      containers:
+      - name: mysql
+        image: manikantaakula/mysql:v1
+        imagePullPolicy: Always
+        # ports:
+        # - containerPort: 80
+        #   name: mysql
+        volumeMounts:
+        - name: mysql
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "roboshop-ebs-databases"
+      resources:
+        requests:
+          storage: 1Gi
+---
