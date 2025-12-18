@@ -1,0 +1,114 @@
+### headless service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-headless
+  namespace: roboshop
+  labels:
+    project: roboshop
+    purpose: mongodb
+    tier: db 
+spec:
+  clusterIP: None
+  selector:
+    project: roboshop
+    purpose: mongodb
+    tier: db
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
+---
+
+### service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  namespace: roboshop
+  labels:
+    project: roboshop
+    purpose: mongodb
+    tier: db 
+spec:
+  selector:
+    project: roboshop
+    purpose: mongodb
+    tier: db
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
+---
+
+### statefullset 
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: roboshop
+spec:
+  selector:
+    matchLabels:
+      project: roboshop
+      purpose: mongodb
+      tier: db # has to match .spec.template.metadata.labels
+  serviceName: "mongodb-headless"
+  replicas: 2 # by default is 1
+  # minReadySeconds: 10 # by default is 0
+  template:
+    metadata:
+      labels:
+        project: roboshop
+        purpose: mongodb
+        tier: db # has to match .spec.selector.matchLabels
+    spec:
+      # terminationGracePeriodSeconds: 10
+      containers:
+      - name: mongodb
+        image: manikantaakula/mongodb:v1
+        # ports:
+        # - containerPort: 80
+        #   name: mongodb
+        volumeMounts:
+        - name: mongodb
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "roboshop-ebs-databases"
+      resources:
+        requests:
+          storage: 1Gi
+---
+
+# ### Autoscaling (No need for auto scaling for databases because they are not running any apllication to increase the traffic)
+
+# apiVersion: autoscaling/v2
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: mongodb
+#   labels:
+#     project: roboshop
+#     purpose: mongodb
+#     tier: db 
+# spec:
+#   namespace: roboshop
+#   scaleTargetRef:
+#     apiVersion: apps/v1
+#     kind: Deployment
+#     name: mongodb
+#   minReplicas: 1
+#   maxReplicas: 10
+#   metrics:
+#   - type: Resource
+#     resource:
+#       name: cpu
+#       target:
+#         type: Utilization
+#         averageUtilization: 50
