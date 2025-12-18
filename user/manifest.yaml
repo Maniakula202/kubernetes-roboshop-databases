@@ -27,7 +27,7 @@ metadata:
     component: user
     tier: backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       project: roboshop
@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
       - name: user
-        image: manikantaakula/user:v1
+        image: joindevops/user:v1
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
