@@ -1,0 +1,89 @@
+### headless service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-headless
+  namespace: roboshop
+  labels:
+    project: roboshop
+    purpose: redis
+    tier: db 
+spec:
+  clusterIP: None
+  selector:
+    project: roboshop
+    purpose: redis
+    tier: db
+  ports:
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379
+---
+
+### service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: roboshop
+  labels:
+    project: roboshop
+    purpose: redis
+    tier: db 
+spec:
+  selector:
+    project: roboshop
+    purpose: redis
+    tier: db
+  ports:
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379
+---
+
+### statefullset 
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: roboshop
+spec:
+  selector:
+    matchLabels:
+      project: roboshop
+      purpose: redis
+      tier: db # has to match .spec.template.metadata.labels
+  serviceName: "redis-headless"
+  replicas: 2 # by default is 1
+  # minReadySeconds: 10 # by default is 0
+  template:
+    metadata:
+      labels:
+        project: roboshop
+        purpose: redis
+        tier: db # has to match .spec.selector.matchLabels
+    spec:
+      # terminationGracePeriodSeconds: 10
+      containers:
+      - name: redis
+        image: redis:7.0
+        imagePullPolicy: Always
+        # ports:
+        # - containerPort: 80
+        #   name: redis
+        volumeMounts:
+        - name: redis
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: redis
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "roboshop-ebs-databases"
+      resources:
+        requests:
+          storage: 1Gi
+---
