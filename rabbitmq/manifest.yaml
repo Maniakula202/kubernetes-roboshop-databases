@@ -69,7 +69,7 @@ spec:
       # terminationGracePeriodSeconds: 10
       containers:
       - name: rabbitmq
-        image: rabbitmq:3.0
+        image: rabbitmq:3
         imagePullPolicy: Always
         # ports:
         # - containerPort: 80
