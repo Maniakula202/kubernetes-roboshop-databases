@@ -5,10 +5,6 @@ kind: ConfigMap
 metadata:
   name: user
   namespace: roboshop
-  labels:
-    project: roboshop
-    component: user
-    tier: backend
 data:
   MONGO: "true"
   REDIS_URL: "redis://redis:6379"
@@ -61,14 +57,12 @@ spec:
             path: /health
             port: 8080
           failureThreshold: 1
-          initialDelaySeconds: 5
           periodSeconds: 3  
         readinessProbe:
           httpGet:
             path: /health
             port: 8080
           failureThreshold: 1
-          initialDelaySeconds: 10
           periodSeconds: 3  
 ---
 
@@ -85,9 +79,9 @@ spec:
     component: user
     tier: backend
   ports:
-  - protocol: TCP
-    port: 8080
-    targetPort: 8080
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
 ---
 
 ### Horizontal replication
