@@ -65,14 +65,14 @@ spec:
             path: /health
             port: 8080
           failureThreshold: 1
-          initialDelaySeconds: 5
+          initialDelaySeconds: 20
           periodSeconds: 3  
         readinessProbe:
           httpGet:
             path: /health
             port: 8080
           failureThreshold: 1
-          initialDelaySeconds: 10
+          initialDelaySeconds: 20
           periodSeconds: 3  
 ---
 
@@ -89,9 +89,9 @@ spec:
     component: payment
     tier: backend
   ports:
-  - protocol: TCP
-    port: 8080
-    targetPort: 8080
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
 ---
 
 ### Horizontal replication
