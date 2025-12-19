@@ -66,14 +66,9 @@ spec:
         purpose: mongodb
         tier: db # has to match .spec.selector.matchLabels
     spec:
-      # terminationGracePeriodSeconds: 10
       containers:
       - name: mongodb
         image: joindevops/mongodb:v1
-        imagePullPolicy: Always
-        # ports:
-        # - containerPort: 80
-        #   name: mongodb
         volumeMounts:
         - name: mongodb
           mountPath: /data/db

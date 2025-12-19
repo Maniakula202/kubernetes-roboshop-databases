@@ -66,14 +66,9 @@ spec:
         purpose: mysql
         tier: db # has to match .spec.selector.matchLabels
     spec:
-      # terminationGracePeriodSeconds: 10
       containers:
       - name: mysql
         image: joindevops/mysql:v1
-        imagePullPolicy: Always
-        # ports:
-        # - containerPort: 80
-        #   name: mysql
         volumeMounts:
         - name: mysql
           mountPath: /data/db
