@@ -1,26 +1,18 @@
-### configmap
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: catalogue
   namespace: roboshop
-  labels:
-    project: roboshop
-    component: catalogue
-    tier: backend
 data:
   MONGO: "true"
   MONGO_URL: "mongodb://mongodb:27017/catalogue"
 ---
-
-### Deployment 
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: catalogue
   namespace: roboshop
+  # these are replica set labels
   labels:
     project: roboshop
     component: catalogue
@@ -28,10 +20,12 @@ metadata:
 spec:
   replicas: 1
   selector:
+    # these labels are used to select pods
     matchLabels:
       project: roboshop
       component: catalogue
       tier: backend
+  # pod definition
   template:
     metadata:
       labels:
@@ -47,7 +41,8 @@ spec:
         - configMapRef:
             name: catalogue
         ports:
-        - containerPort: 8080
+        - name: liveness-port
+          containerPort: 8080
         resources:
           requests:
             cpu: "100m"
@@ -55,24 +50,19 @@ spec:
           limits:
             cpu: "100m"
             memory: "128Mi"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          failureThreshold: 1
-          initialDelaySeconds: 5
-          periodSeconds: 3  
         readinessProbe:
           httpGet:
             path: /health
-            port: 8080
+            port: liveness-port
           failureThreshold: 1
-          initialDelaySeconds: 10
-          periodSeconds: 3  
+          periodSeconds: 15
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: liveness-port
+          failureThreshold: 1
+          periodSeconds: 15
 ---
-
-## service
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -85,12 +75,9 @@ spec:
     tier: backend
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 8080
+      port: 8080 # service port
+      targetPort: 8080 # container port
 ---
-
-### Horizontal replication
-
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -113,4 +100,4 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 50
+        averageUtilization: 5 # 70 is the real value
