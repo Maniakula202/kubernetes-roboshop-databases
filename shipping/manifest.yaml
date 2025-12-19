@@ -26,7 +26,7 @@ metadata:
     component: shipping
     tier: backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       project: roboshop
@@ -47,7 +47,8 @@ spec:
         - configMapRef:
             name: shipping
         ports:
-        - containerPort: 8080
+        - name: liveness-port
+          containerPort: 8080
         resources:
           requests:
             cpu: "100m"
@@ -58,16 +59,14 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 8080
+            port: liveness-port
           failureThreshold: 1
-          initialDelaySeconds: 5
           periodSeconds: 3  
         readinessProbe:
           httpGet:
             path: /health
-            port: 8080
+            port: liveness-port
           failureThreshold: 1
-          initialDelaySeconds: 10
           periodSeconds: 3  
 ---
 
@@ -84,9 +83,9 @@ spec:
     component: shipping
     tier: backend
   ports:
-  - protocol: TCP
-    port: 8080
-    targetPort: 8080
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
 ---
 
 ### Horizontal replication
